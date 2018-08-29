@@ -9,16 +9,13 @@ output:
 ---
 
 
-Emily Piché
- 
-*August 29, 2019*
-
-##My homeworks
+####My homework assignments
 
 * Hw1
     + first item
     + second item
 
+####Here is how you make a link!
 
 * [Wikipedia](http://www.wikipedia.org)
 

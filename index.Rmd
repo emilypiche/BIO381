@@ -4,13 +4,16 @@ output: html_document
 ---
 
 Emily Piché
-
+ 
 *August 29, 2019*
 
 ##My homeworks
 
 * Hw1
-  + first item
-  + second item
+    + first item
+    + second item
+
 
 * [Wikipedia](http://www.wikipedia.org)
+
+

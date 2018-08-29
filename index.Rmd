@@ -9,14 +9,17 @@ output:
 ---
 
 
-####My homework assignments
 
-* Hw1
+####My homework assignments will live here:
+
+* Like so! 
     + first item
     + second item
 
-####Here is how you make a link!
+####And here is how you make a link!
 
 * [Wikipedia](http://www.wikipedia.org)
+
+
 
 

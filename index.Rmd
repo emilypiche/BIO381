@@ -4,7 +4,7 @@ author: "Emily Piché"
 date: "`r Sys.Date()`"
 output:
   prettydoc::html_pretty:
-    theme: lumen
+    theme: leonids
     highlight: github
 ---
 

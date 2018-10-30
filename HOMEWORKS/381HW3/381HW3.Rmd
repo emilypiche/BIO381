@@ -1,0 +1,68 @@
+---
+title: "Biodiversity, function, and soil "
+author: "Emily P. Piché"
+date: "9/12/2018"
+output: 
+  beamer_presentation: 
+    colortheme: dolphin
+    highlight: espresso
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+--- CURRENTLY INCOMPLETE ---
+
+## Week 3 assigment instructions
+https://gotellilab.github.io/Bio381/Homeworks/Homework03_F2018.html
+
+
+Create a short Beamer presentation (6 to 12 slides). Note that you will need to save your images to .tiff. or .jpeg or other digital formats and put them in a folder that can be linked to from your Beamer code.
+
+Spend a bit of time exploring the different themes, colors, and fonts available in Beamer, and set up something that looks nice to you.
+
+Your presentation should include the following:
+
+- \color{gray}sequential bullet points
+- simultaneous bullet points
+- colored text
+- images
+- images with captions
+- images with a caption overlaid (you may need to change the text color for better contrast)
+
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+
+## Slide with one image
+
+
+
+## Slide with two images
+
+\begin{picture}(320,250)
+\put(0,120){\includegraphics[height=4cm]{IMG_1407.JPG}}
+\put(180,120){\includegraphics[height=4cm]{IMG_1407.JPG}}
+\put(10,75){\begin{minipage}[t]{1\linewidth}
+  {This is a picture of soils from \textit{Mt Mansfield} -
+  \textbf{I set them on fire first}. They're colorful!}
+  \end{minipage}}
+  \end{picture}
+

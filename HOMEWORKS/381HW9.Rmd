@@ -1,0 +1,27 @@
+---
+title: "Homework 9"
+author: "Emily P. Piché"
+date: "10/24/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+```
+
+PROBLEM 1
+Using a for or while loop, write a function to calculate the number of zeroes in a numeric vector.
+```{r}
+# code snagged from stack overflow to create a 1,0 vector:
+x <- (sample(c(0,1), replace=TRUE, size=20))
+# how I would count this if I wasn't using a for loop
+sum(x==0)
+
+y<-0
+# a for loop to count the number of zeros in a numeric vector:
+for (i in 1:length(x)) {
+  if(x[i] == 0) {
+  y <- y + 1
+  }}
+y
+```

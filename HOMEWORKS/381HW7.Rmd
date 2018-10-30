@@ -1,0 +1,101 @@
+---
+title: "Homework 7"
+author: "Emily P. Piché"
+date: "10/10/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+```
+
+A pattern I hypothesized that I would see at my sites is a positive relationship between soil organic matter (%) and the proportion of conifers on a plot (%). After collecting my data this summer, I found that at my 23 sites, the proportion of conifers on each plot explained 25% of the variation in soil organic matter. 
+
+Here I will create a fake dataset to explore this hypothesis in R using a normal distribution. 
+
+
+Sample sizes and means of my soil organic matter and conifer data:
+```{r}
+# calling up MASS and ggplot2
+library(MASS)
+library(ggplot2)
+library(dplyr)
+# reading in my own data from a csv
+PL <- read.csv("/Users/emilypiche/Desktop/plotlevel.csv", as.is=TRUE)
+#SOM - real soil organic matter data
+SOM <- PL$LOI
+#RC - real conifer proportion data
+RC <- PL$CONIFER_D
+
+# SOM parameters
+normPars1 <- fitdistr(SOM,"normal")
+normPars1
+# conifer parameters
+normPars2 <- fitdistr(RC,"normal")
+normPars2
+
+```
+
+Assuming these two groups follow a normal distribution (propotion of conifers in each plot, and soil organic matter content (%)), I simulated the following distributions based on parameters from my actual data. I had 23 sites, the mean proportion of conifers was .33, and the standard deviation was 0.325. I created the fake SOM data from the fake conifer data (rather than generating it on its own) because I wanted to generate data that would show a positive relationship with a simple regression, and did not use the actual parameters from my SOM data (n=23, mean=.33, sd=.20)
+```{r}
+fCon <- rnorm(length(RC), normPars2$estimate["mean"], normPars2$estimate["sd"]) # creating fake conifer proportions
+e <- rnorm(23, .2, .1) # creating some noise
+
+# OM content is a function of the proportion of conifers on each plot, so simulated SOM is created using a noise factor and the fCon data
+fSOM <- 0 + .1*fCon+ e 
+
+# putting data into a dataframe 
+simData <- data.frame(fCon, fSOM)
+head(simData)
+```
+
+The following chunk shows the results of a linear model. I found on the first run that change in generated proportion of conifers on each plot explained 34% of the variation in generated soil organic matter content, which is a bit higher than I what was attempting to achieve.
+
+```{r}
+# summary of a linear model of my generated conifer and SOM data
+sum <- summary(lm(simData$fSOM~simData$fCon))
+r2<-sum$adj.r.squared
+p<-sum$coefficients[7]
+# r^2 of the linear model
+r2
+# p value of linear model
+p
+```
+
+Here is figure showing one version of the generated data:
+(This may or may not show a significant relationship depending on the generated data)
+```{r}
+qplot(simData$fCon,simData$fSOM,
+      xlab="Simulated proportion of Conifers",
+      ylab="Simulated soil organic matter (%)")+ theme_bw() + geom_smooth(method="lm")
+```
+
+The r-squared varied quite a bit each time I ran the code, which is likely a factor of the low sample size (.05 - .45). In my real dataset, each site is represented with 3 different cores which are averaged for each site. I think that if I generated the code in this way, it would reduce some of the variation between runs. I also found that I could not constrain the proportion of conifers in the overstory to only include positive numbers because I am doing this exercise using a normal distribution.
+
+In this chunk below, I have adjusted the level of noise in my SOM data to see how much it reduces the variability between runs through the linear model. I found that each time I created new SOM data, it showed a significant relationship.
+```{r}
+e2 <- rnorm(23, .5, .05) # creating less noise with 0.05 sd rather than 0.5, and increasing the mean to .5
+
+# new fake SOM data
+fSOM2 <- 0 + .1*fCon+ e2 
+
+# new dataframe with fSOM2
+simData2 <- data.frame(fCon, fSOM2)
+head(simData2)
+
+# summary of a linear model of my generated conifer and SOM data
+sum2 <- summary(lm(simData2$fSOM2~simData$fCon))
+unlist(sum2)
+R2<-sum2$adj.r.squared
+P<-sum2$coefficients[7]
+# r^2 of the linear model
+R2
+# p value of linear model
+P
+
+# plot of data with SOM that has less generated noise
+qplot(simData2$fCon, simData2$fSOM2,
+      xlab="Simulated proportion of Conifers",
+      ylab="Simulated soil organic matter (%)")+ theme_bw() + geom_smooth(method="lm")
+```
+

@@ -1,0 +1,40 @@
+---
+title: "Iris Homework"
+author: "Emily P. Piché"
+date: "10/3/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+```
+.
+.
+.
+
+
+####Problem:
+Convert data to longformat with a column called "trait" to indicate sepal and petal length and width, and find the mean of for each species x trait combination.
+
+```{r echo=FALSE, results='hide'}
+library(dplyr)
+library(tidyverse)
+```
+
+```{r}
+data(iris)
+head(iris)
+
+longForm <- iris %>% 
+  gather(Sepal.Length:Petal.Width, key="Trait", value="Size") %>%
+  arrange(Species)
+  head(longForm)
+  
+irisSummary <- longForm %>%
+  group_by(Trait, Species) %>%
+  summarize(AvgSize = mean(Size)) %>%
+  arrange(Species, Trait)
+
+print(irisSummary)
+```
+

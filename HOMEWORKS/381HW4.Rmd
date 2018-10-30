@@ -1,0 +1,193 @@
+---
+title: "Homework 4"
+author: "Emily P. Piché"
+date: "9/19/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r problem 1}
+# Problem 1 #
+# Assigning values to variables #
+x <- 1.1
+a <- 2.2
+b <- 3.3
+
+# a
+z <- x^a^b
+print(z)
+# b
+z <- ((x^a)^b)
+print(z)
+# c
+z <- ((3*(x^3))+(2*(x^2))+1)
+print(z)
+```
+
+```{r problem 2}
+# Problem 2 #
+# Using the rep and seq functions #
+
+# a
+a <- c(seq(1,8),seq(7,1))
+print(a)
+
+# b
+bVec <- seq(1,5)
+b <- rep(x=bVec,times=bVec)
+print(b)
+
+# c
+cVec <- seq(5,1)
+c <- rep(x=cVec,times=bVec)
+print(c)
+```
+
+```{r problem 3}
+# Problem 3 # 
+# Random number generation #
+
+cart <- runif(2)
+names(cart) <- c("x","y")
+print(cart)
+polar <- c(sqrt((cart[1]^2)+(cart[2]^2)),atan(cart[2]/cart[1]))
+names(polar) <- c("r","theta")
+print(polar)
+
+```
+
+```{r logic problem 4}
+# Problem 4 #
+# Queuing up Noah's Ark with both impatient and polite critters #
+
+# intial queue
+queue <- c("sheep", "fox", "owl", "ant")
+print(queue)
+# serpent arrives at the end of the line
+queueA <- c(queue, "serpent")
+print(queueA)
+# sheep enters the ark
+queueB <- queueA[2:5]
+print(queueB)
+# the donkey is pushy
+queueC <- c("donkey", queueB)
+print(queueC)
+# serpent is bored with this and leaves
+queueD <- queueC[1:4]
+print(queueD)
+# the owl is also bored and leaves
+queueE <- queueD[-3]
+print(queueE)
+# the ant is polite to the aphid
+queueF <- c(queueE[1:2],"aphid",queueE[3])
+print(queueF)
+# but how far down the line is the aphid?
+match("aphid",queueF)
+```
+
+```{r problem 5}
+
+Filter(function(n) 
+  {all(n %% c(2,3,5) != 0)}, 
+                seq(1:100))
+
+```
+
+```
+Problem 6 - Regular Expressions
+
+Original text:
+
+First String	Second		1.22		3.4
+Second			More Text	1.555555	2.2220
+Third			x			3			124
+```
+`Find is "\t+" and Replace is ","`
+
+```
+Transformed text:
+
+First String,Second,1.22,3.4
+Second,More Text,1.555555,2.2220
+Third,x,3,124
+```
+```
+Problem 7
+
+Original text:
+
+Ballif, Bryan, University of Vermont
+Ellison, Aaron, Harvard Forest
+Record, Sydne, Bryn Mawr
+```
+`Find with '(\w+),\s(\w+),\s(.*)' Replace with '\2 \1 (\3)`
+
+```
+Transformed text:
+
+Bryan Ballif (University of Vermont)
+Aaron Ellison (Harvard Forest)
+Sydne Record (Bryn Mawr)
+```
+
+```
+Problem 8
+
+Original text:
+
+0001 Georgia Horseshoe.mp3 0002 Billy In The Lowground.mp3 0003 Cherokee Shuffle.mp3 0004 Walking Cane.mp3
+```
+`Find with "(\d{4})", replace with "\n\1"`
+
+```
+Transformed text:
+
+ 0001 Georgia Horseshoe.mp3 
+ 0002 Billy In The Lowground.mp3 
+ 0003 Cherokee Shuffle.mp3 
+ 0004 Walking Cane.mp3
+ ```
+ `Find with "(\d{4})\s(.*)(.mp3)" replace with "\2_\1\3"`
+ ```
+Transformed text:
+ 
+Georgia Horseshoe_0001.mp3 
+Billy In The Lowground_0002.mp3 
+Cherokee Shuffle_0003.mp3 
+Walking Cane_0004.mp3
+```
+
+```
+Problem 9
+
+Original text:
+
+Camponotus,pennsylvanicus,10.2,44
+Camponotus,herculeanus,10.5,3
+Myrmica,punctiventris,12.2,4
+Lasius,neoniger,3.3,55
+```
+`Find with "([A-Z])(\w+),(\w+),(\d+.\d),(\d+)" find with "\1_\3,\5"`
+ 
+```
+Transformed text:
+ 
+C_pennsylvanicus,44
+C_herculeanus,3
+M_punctiventris,4
+L_neoniger,55
+```
+
+`Find with "([A-Z])(\w+),(\w{4})(\w+),(\d+.\d),(\d+)" replace with "\1_\3,\6"`
+```
+Transformed text (from original):
+
+C_penn,44
+C_herc,3
+M_punc,4
+L_neon,55
+```

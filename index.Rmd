@@ -10,15 +10,12 @@ output:
 
 
 
-####My homework assignments will live here:
+### Biology 381 Homework Submissions:
 
-* Like so! 
-    + first item
-    + second item
+* [Homework #2](381HW2.html)
+* [Homework #3](381HW3.html)
+* [Homework #4](381HW4.html)
 
-####And here is how you make a link!
-
-* [Wikipedia](http://www.wikipedia.org)
 
 
 

@@ -1,0 +1,27 @@
+---
+title: "Homework 02"
+author: "Emily P. Piché"
+date: "9/5/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+--- CURRENTLY INCOMPLETE --- 
+
+Link to instructions: https://gotellilab.github.io/Bio381/Homeworks/Homework02_F2018.html
+
+INSTRUCTIONS:
+Take a broad, self-critical look at your entire thesis/honors project. What are the big questions you are asking, and what are the specific hypotheses and mechanisms that your experiments and sampling are trying to address? How will you interpret the different possible results from your activities? Be explicit and detailed; do not hide behind jargon or vague statements.
+
+Translate your answers to these questions into any 2 of the 4 diagrams we discussed in class: a) cause-and-effect diagram; b) pre-graph; c) DIPSwitch table c) logic tree. You may have to try several versions to get a satisfying result.
+
+Add Markdown titles, formatting, and text, and develop a narrative to explain each figure, the hypotheses they elaborate, and the expected outcomes of your experiments and observations. If you hit a wall in developing your hypotheses, try to write some text explaining what the issues are.
+
+For my masters thesis project, I am looking into the relationship between aboveground species and soil functions on Mt. Mansfield. I am interested in this because 
+
+Below is a test run of how to make a flowchart
+
+![picture](test.png)

@@ -1,0 +1,88 @@
+---
+title: "Homework 5"
+author: "Emily P. Piché"
+date: "9/26/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+#### 1
+#retrieving dplyr
+library(dplyr)
+# retrieving the iris dataframe
+data(iris)
+# checking out what the iris dataframe looks like
+head(iris)
+# what is the structure of the iris dataframe? 150 observations with 5 variables
+str(iris)
+
+#### 2
+# create a new dataframe with only the species virginica or versicolor with sepal lengths greater than 6 and sepal widths less than 2.5
+iris1 <- filter(iris, Species == "virginica" | Species == "versicolor", Sepal.Length > 6, Sepal.Width > 2.5)
+# checking out my hard work!
+head(iris1)
+# what is the structure? data.frame! 56 observations with 5 variables
+str(iris1)
+
+#### 3
+# create a new dataframe with only the variables Species, Sepal.Length, and Sepal.Width
+iris2 <- select(iris1, Species, Sepal.Length, Sepal.Width)
+# did I do this correctly? YEP
+head(iris2)
+# 56 observations and 3 variables
+str(iris2)
+
+#### 4
+# create iris3 from iris2 that orders the observations from largest to smallest sepal length
+iris3 <- arrange(iris2, desc(Sepal.Length))
+# first 6 observations of this new dataframe
+head(iris3)
+
+#### 5
+# create a new column with the sepal width in iris4
+iris4 <- mutate(iris3, Sepal.Area = Sepal.Length*Sepal.Width)
+# 56 observations with 4 variables
+str(iris4)
+
+#### 6
+# take the means and find the sample size
+iris5 <- summarize(iris4, meanLength = mean(Sepal.Length), 
+                   meanWidth = mean(Sepal.Width), 
+                   sampleSize = n())
+print(iris5)
+
+#### 7
+# take the means and find the same size for each species
+IRIS <- group_by(iris4, Species)
+iris6 <- summarize(IRIS, meanLength = mean(Sepal.Length), 
+                   meanWidth = mean(Sepal.Width), 
+                   sampleSize = n())
+# what does it look like now!
+print(iris6)
+
+
+#### Now pipe everything together!
+
+iris %>%
+  filter(Species == "virginica" | Species == "versicolor", 
+         Sepal.Length > 6, 
+         Sepal.Width > 2.5) %>%
+  select(Species, Sepal.Length, Sepal.Width) %>%
+  arrange(desc(Sepal.Length)) %>%
+  mutate(Sepal.Area = Sepal.Length*Sepal.Width) %>%
+  group_by(Species) %>%
+  summarize(meanLength = mean(Sepal.Length), 
+                   meanWidth = mean(Sepal.Width), 
+                   sampleSize = n())
+
+```
+
+
+
+
+

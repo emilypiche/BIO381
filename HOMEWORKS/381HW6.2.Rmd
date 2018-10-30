@@ -1,0 +1,133 @@
+---
+title: "Homework 6.2"
+author: "Emily P. Piché"
+date: "10/3/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+```
+
+```{r}
+### Read in your own data file
+z <- read.csv("/Users/emilypiche/Desktop/soildata.csv", as.is=TRUE,header=TRUE,sep=",",stringsAsFactors=FALSE)
+library(ggplot2) # for graphics
+library(MASS) # for maximum likelihood estimation
+```
+
+Create a distribution to use for the following chunks. After running them, go back and re-run your own data through.
+```{r}
+# z <- rnorm(n=3000,mean=0.2)
+# z <- data.frame(1:3000,z)
+# names(z) <- list("ID","myVar")
+# z <- z[z$myVar>0,]
+```
+
+Plotting a histogram of the data:
+```{r}
+# made a vector of the LOI column called "SOM"
+SOM <- z$LOI
+p1 <- ggplot(data=z, aes(x=SOM, y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk") 
+print(p1)
+```
+
+Add empirical density curve
+```{r}
+p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
+print(p1)
+```
+
+Get maximum likelihood parameters for normal
+```{r}
+normPars <- fitdistr(SOM,"normal")
+print(normPars)
+str(normPars)
+normPars$estimate["mean"] 
+normPars$estimate["sd"] 
+```
+
+Plot normal probability density
+```{r}
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+xval <- seq(0,max(z$LOI),len=length(SOM))
+
+stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(SOM), args = list(mean = meanML, sd = sdML))
+ p1 + stat
+```
+
+Plot exponential probability density
+```{r}
+expoPars <- fitdistr(SOM,"exponential")
+rateML <- expoPars$estimate["rate"]
+
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(SOM), args = list(rate=rateML))
+ p1 + stat + stat2
+```
+ 
+Plot uniform probability density
+```{r}
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(SOM), args = list(min=min(SOM), max=max(SOM)))
+ p1 + stat + stat2 + stat3
+```
+
+
+Plot gamma probability density
+```{r}
+gammaPars <- fitdistr(SOM,"gamma")
+shapeML <- gammaPars$estimate["shape"]
+rateML <- gammaPars$estimate["rate"]
+
+stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="brown", n = length(SOM), args = list(shape=shapeML, rate=rateML))
+ p1 + stat + stat2 + stat3 + stat4
+```
+ 
+Plot beta probability density
+```{r}
+pSpecial <- ggplot(data=z, aes(x=SOM/(max(SOM + 0.1)), y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) + 
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted")
+
+betaPars <- fitdistr(x=SOM/max(SOM + 0.1), start=list(shape1=1,shape2=2), "beta")
+shape1ML <- betaPars$estimate["shape1"]
+shape2ML <- betaPars$estimate["shape2"]
+
+shape2ML
+betaPars
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(SOM), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+
+summary(SOM)
+
+```
+
+Creating a gamma distribution with the features of my own data
+```{r}
+gammaPars <- fitdistr(SOM,"gamma")
+shapeML <- gammaPars$estimate["shape"]
+rateML <- gammaPars$estimate["rate"]
+
+myGamma <- rgamma(n=length(SOM), shape=shapeML, rate=rateML)
+gammaDist <- qplot(x=myGamma, color=I("black"),fill=I("goldenrod"))
+
+xval <- seq(0,max(myGamma),len=length(myGamma))
+
+fakeGamma <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="brown", n = length(SOM), args = list(shape=shapeML, rate=rateML))
+
+gammaDist + fakeGamma
+
+```
+
+I found that though the gamma distribution seemed to fit my soil organic matter data best. But, when I simulated the data and fit the gamma probability density curve, I found that the curve did not seem to fit the simulated data. Instead, it seems to show much lower values than the simulation actually produced.
+
+Here are the summaries of my real data versus the simulated data:
+```{r}
+summary(SOM)
+summary(myGamma)
+```
+

@@ -9,19 +9,128 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 ```
 
-PROBLEM 1
+PROBLEM 1:
+
 Using a for or while loop, write a function to calculate the number of zeroes in a numeric vector.
 ```{r}
-# code snagged from stack overflow to create a 1,0 vector:
+# code snagged from stack overflow & modified to create a 1,0 vector:
 x <- (sample(c(0,1), replace=TRUE, size=20))
-# how I would count this if I wasn't using a for loop
-sum(x==0)
 
-y<-0
-# a for loop to count the number of zeros in a numeric vector:
+# setting up an external counting element
+y <- 0
+# the for loop adds a 1 to the counter every time it encounters a zero
 for (i in 1:length(x)) {
   if(x[i] == 0) {
   y <- y + 1
   }}
 y
 ```
+
+PROBLEM 2:
+
+Use subsetting to rewrite the function as a single line of code
+```{r}
+sum(x==0)
+
+```
+
+PROBLEM 3:
+
+Write a function that takes as input two integers representing the number of rows and columns in a matrix. The output is a matrix of these dimensions in which each element is the product of the row number x the column number.
+```{r}
+makeMatrix <- function(nRow=10, nCol=5){
+m <- matrix(data=NA, nrow=nRow, ncol=nCol)
+for(i in 1:nrow(m)){
+  for(j in 1:ncol(m)){
+    m[i,j] <- i*j
+  }}
+return(m)
+}
+makeMatrix(4,8)
+```
+
+PROBLEM 4:
+
+Use the code from yesterday’s class to design and conduct a randomization test for some of your own data. You will need to modify the functions that read in the data, calculate the metric, and randomize the data. Once those are set up, the program should run correctly calling your new functions. Also, to make your analysis fully repeatable, make sure you set the random number seed at the beginning (use either set.seed() in base R, or char2seed in the TeachingDemos package
+```{r}
+library(ggplot2)
+set.seed(1031)
+
+# read data modified to read in my CSV and extract columns for gravimetric water content and extracellular enzyme activity (EEA of XYL)
+readData <- function(z=NULL){
+    data <- read.table(file=z, header=TRUE, sep=",", stringsAsFactors=FALSE)
+    dF <- data.frame(ID=seq_along(data[,7]), data[,7], data[,10])
+  return(dF)
+}
+
+# simplified the functions from yesterday to run my data
+# get metric finds the slope of the linear model 
+getMetric <- function(z=NULL){
+  . <- lm(z[,3]~z[,2])
+  . <- summary(.)
+  . <- .$coefficients[2,1]
+  slopes <- .
+  return(slopes)
+}
+
+# this shuffles all of the data from the enzyme
+shuffleData <- function(z=NULL){
+    z[,3] <- sample(z[,3])
+    return(z)
+}
+
+# this function will be used to show the number of times the simulation resulted in a significant relationship vs not significant out of 1000 times
+getPVal <- function(z=NULL) {
+  pLower <- mean(z[[2]]<=z[[1]])
+  pUpper <- mean(z[[2]]>=z[[1]])
+  return(c(pL=pLower,pU=pUpper))
+  }
+
+# plots a histogram of simulation outcomes 
+plotRanTest <- function(z=NULL) {
+  dF <- data.frame(ID=seq_along(z[[2]]),simX=z[[2]])
+  p1 <- ggplot(data=dF,mapping=aes(x=simX))
+  p1 + geom_histogram(mapping=aes(fill=I("goldenrod"),color=I("black"))) +
+    geom_vline(aes(xintercept=z[[1]],col="blue")) 
+}
+
+## using the code from Lauren at the beginning of lab to string the functions together ---
+
+nSim <- 1000
+Xsim <- rep(NA, nSim)
+dF <- readData("/Users/emilypiche/Desktop/soildata.csv")
+# naming my columns! just to remember what we are looking at
+colnames(dF) <- c("ID","GWC","EEA")
+Xobs <- getMetric(dF)
+
+for(i in seq_len(nSim)){
+  Xsim[i] <- getMetric(shuffleData(dF))
+}
+
+slopes <- list(Xobs, Xsim)
+
+getPVal(slopes)
+plotRanTest(slopes)
+
+```
+
+PROBLEM 5:
+
+For comparison, calculate in R the standard statistical analysis you would use with these data. How does the p-value compare for the standard test versus the p value you estimated from your randomization test? 
+```{r}
+# this is a function I used for another class:
+find.p <- function (modelobject) {
+  f <- summary(modelobject)$fstatistic
+  p <- pf(f[1],f[2],f[3],lower.tail=F)
+  attributes(p) <- NULL
+  return(p)}
+
+# lm of my data
+summary <- lm(dF[,3]~dF[,2])
+find.p(summary)
+
+# I would say they are pretty darn close - I think if I ran 10,000 simulations instead of 1000, these values would be even closer. It looks normally distributed, so I think the more times the simulation is run, the more "normal" the histogram will look.
+```
+
+
+

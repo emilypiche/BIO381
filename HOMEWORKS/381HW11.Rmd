@@ -1,0 +1,25 @@
+---
+title: "Homework 11"
+author: "Emily P. Piché"
+date: "11/7/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Here are some nice figures made in ggplot2
+```{r}
+Soil <- read.csv("/Users/emilypiche/Desktop/soildata.csv", as.is=TRUE)
+
+p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point() 
+p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point() p1
+p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point() 
+p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point()
+p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point() 
+
+
+g1 + g2 + g3 + plot_layout(ncol=1)
+```

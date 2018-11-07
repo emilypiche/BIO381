@@ -37,16 +37,16 @@ fakeCon <- rnorm(length(RC), normPars2$estimate["mean"], normPars2$estimate["sd"
 # sd = standard deviation of added noise 
 # int = intercept of equation to set relationship with original data
 # exp = expansion transforms data
-# OUTPUTS: new vector of transformed data
+# OUTPUTS: new vector of transformed data, which only displays positive numbers (cant have negative soil organic matter or number of conifers on a plot). This might not be exactly a normal distibution anymore?! Would be preferable to write in a line that takes a number that is less than zero and replaces it with a zero
 # -------------
 makeNoise <- function(var1=runif(10), m=.5, sd=.25, int=0, exp=1){
   e <- rnorm(length(var1), m, sd)
   newVar <- int + exp*var1 + e 
-  newFrame <- data.frame(var1, newVar)
+  newFrame <- data.frame(abs(var1), abs(newVar))
   return(newFrame)
 }
 # -------------
-fakeSOM <- makeNoise(fakeCon, .2, .1, 0, .1)
+fakeSOM <- makeNoise(fakeCon, .2, .1, .1, .05)
 
 
 # The following function will run a linear regression of of the new variable against the original variable:
@@ -85,8 +85,7 @@ showScatter(fakeSOM)
 
 
 ####### Daisy Chaining my functions together? ########
-fakeSOM <- makeNoise(fakeCon, .2, .1, 0, .1)
+fakeSOM <- makeNoise(fakeCon, .2, .2, .1, .4)
 testFakes(fakeSOM)
 showScatter(fakeSOM)
 ```
-The problem I seem to still be having is that the normal distribution creates values of less than zero for proportion of conifers on the plot. I want to be able to set any values that are less than zero to zero.

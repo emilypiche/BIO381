@@ -6,20 +6,44 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 ```
 
 
-Here are some nice figures made in ggplot2
+Here are some nice figures made in ggplot2! They show six of the extracellular enzymes I measured along an elevation gradient on Mt. Mansfield this summer. The data are displayed as activity/gram carbon/hour vs gravimetric water content or pH. I used the light theme and different colors for the points, and changed the axis labels to be more informative than the defaults. I also changed the regression line to black rather than blue because I thought it was easier on the eyes (especially next to the very loud colors I chose for the points).
+
+
 ```{r}
+library(ggplot2)
+library(ggthemes)
+library(patchwork)
 Soil <- read.csv("/Users/emilypiche/Desktop/soildata.csv", as.is=TRUE)
 
-p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point() 
-p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point() p1
-p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point() 
-p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point()
-p1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point() 
+g1 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AG_C)) + geom_point(color=I("magenta")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="Gravimetric Water Content", y="AG activity /g C/hr") 
 
+g2 <- ggplot(data=Soil, mapping=aes(x=GWC,y=BG_C))+ geom_point(color=I("blue")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="Gravimetric Water Content", y="BG activity /g C/hr") 
 
-g1 + g2 + g3 + plot_layout(ncol=1)
+g3 <- ggplot(data=Soil, mapping=aes(x=GWC,y=XYL_C)) + geom_point(color=I("red")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="Gravimetric Water Content", y="XYL activity /g C/hr") 
+
+g4 <- ggplot(data=Soil, mapping=aes(x=GWC,y=NAG_C)) + geom_point(color=I("green")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="Gravimetric Water Content", y="NAG activity /g C/hr") 
+
+g5 <- ggplot(data=Soil, mapping=aes(x=GWC,y=AP_C)) + geom_point(color=I("goldenrod")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="Gravimetric Water Content", y="AP activity /g C/hr") 
+
+g6 <- ggplot(data=Soil, mapping=aes(x=GWC,y=PER_C)) + geom_point(color=I("magenta")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="Gravimetric Water Content", y="PER activity /g C/hr") 
+
+g1 + g2 + g3 + g4 + g5 + g6
+
+p1 <- ggplot(data=Soil, mapping=aes(x=pH,y=AG_C)) + geom_point(color=I("magenta")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="pH", y="AG activity /g C/hr") 
+
+p2 <- ggplot(data=Soil, mapping=aes(x=pH,y=BG_C))+ geom_point(color=I("blue")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="pH", y="BG activity /g C/hr") 
+
+p3 <- ggplot(data=Soil, mapping=aes(x=pH,y=XYL_C)) + geom_point(color=I("red")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="pH", y="XYL activity /g C/hr") 
+
+p4 <- ggplot(data=Soil, mapping=aes(x=pH,y=NAG_C)) + geom_point(color=I("green")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="pH", y="NAG activity /g C/hr") 
+
+p5 <- ggplot(data=Soil, mapping=aes(x=pH,y=AP_C)) + geom_point(color=I("goldenrod")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="pH", y="AP activity /g C/hr") 
+
+p6 <- ggplot(data=Soil, mapping=aes(x=pH,y=PER_C)) + geom_point(color=I("magenta")) + theme_light() + geom_smooth(method="lm", color=I("black")) + labs(x="pH", y="PER activity /g C/hr") 
+
+p1 + p2 + p3 + p4 + p5 + p6
 ```

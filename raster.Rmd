@@ -1,0 +1,235 @@
+---
+title: "Downloading and exploring raster data"
+author: "Emily P. Piché"
+date: "12/1/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+```
+
+## A tutorial on the raster package
+
+Here are the main packages we are going to use in this tutorial:
+```{r}
+library(rgdal)
+library(raster)
+library(sp)
+```
+
+What is the packages raster used for? For one, you can read in and extract data from your own raster files using r. Raster also allows you to directly download spatial data from a number of global datasets, some of which we will explore below.
+
+What does this mean? Rasters are matrices of cells in rows and columns that each contain a value representing information such as temp, elevation, etc. In other words, they are gridded data that are saved in pixels, and each pixel represents an area on the earth's surface. 
+
+We can start by exploring how to download and extract climate data.
+
+First, lets look at the worldclim website: 
+http://www.worldclim.com/version2
+
+Worldclim is a database of globally interpolated climate data. You can see there are four different spatial resolutions we can look at with the worldclim database. We are going to start with the smallest size, the 30 second grid, and then later look at an example from the 2.5 minute grid as well. 
+
+So, what climate data do we want to see? How about somewhere in Vermont!
+
+Lets create some random points around Mt. Mansfield:
+```{r}
+set.seed(802)
+long <- runif(10, -72.85, -72.78)
+lat <- runif(10, 44.5, 44.6)
+# a vector of ID numbers for these coordinates
+ID <- 1:10
+# bind the long and lat into a dataframe
+coords <- data.frame(long, lat)
+```
+
+Where did these points end up falling on the landscape?
+
+Since we already downloaded leaflet for Anoob's presentation, I thought we could visualize these coordinates using some code we learned from him.
+
+```{r}
+library(leaflet)
+library(maps)
+# visualizing the ten coordinates we generated:
+leaflet(data=coords) %>% 
+  addProviderTiles(providers$Esri.NatGeoWorldMap) %>% 
+  addCircleMarkers(~long, ~lat, label=as.character(ID))
+```
+
+Next, lets download raster data from Worldclim using the raster::getData function. These raster values are calculated from a number of major climate databases and elevational data from the SRTM database (NASA). Worldclim has 19 bioclimatic variables that we can look at for the current climate. http://www.worldclim.org/bioclim 
+
+Their website also shows the locations of weather stations used for interpolating these data:
+http://www.worldclim.org/methods1 
+
+To download the data we are interested in, we need to supply which database we are downloading from, the variable we are interested in, the resolution (in minutes), and a coordinate that is within the general area we are intersted in. We need to do this last part because raster::getData will download just a chunk of the dataset instead of the whole global dataset (which would be even more time consuming and take up a LOT of space)! 
+
+This chunk of the dataset is called a tile. 
+
+```{r}
+# downloading the bioclimatic variables from worldclim at a resolution of 30 seconds (.5 minutes)
+r <- getData("worldclim", var="bio", res=0.5, lon=-72, lat=44)
+# lets also get the elevational data associated with the climate data
+alt <- getData("worldclim", var="alt", res=.5, lon=-72, lat=44)
+```
+
+You can aquire tiles from other databases with this function - GADM is a database of global administrative boundaries, SRTM is the 90 meter elevational data from NASA (we indiredctly picked this data up at a lower resolution through worldclim), and the 'countries' database has high resolution country boundaries.
+
+So, what type of object do we have now? A raster stack!
+```{r}
+class(r)
+```
+
+How many layers in the stack?
+```{r}
+nlayers(r) 
+```
+
+We see that alt is just one raster layer
+```{r}
+class(alt)
+nlayers(alt)
+```
+
+A RasterStack is a collection of raster layers with the same extent and resolution. We can also see this when we unlist r:
+```{r}
+unlist(r)
+unlist(alt)
+```
+
+The names names that start with 'bio' in our RasterStack "r" refer to the 19 available bioclimatic varaibles. When you aquire a tile from worldclim with getData, you actually get all the bioclimatic varaibles together. You can select which ones you would like to look at after downloading.
+
+When we unlist the raster object, we also see something called 'extent.' The extent is telling us the min and max for the lat and long of the tile we aquired. We also see the coordinate system listed as WGS84.
+
+Before we extract the data for each coordinate, lets plot one of these tiles in base r to see what it looks like. Don't be surprised if this takes a minute to load on your computer.
+```{r}
+plot(alt)
+```
+
+To get a better idea of the area we are interested in, lets look at the rectangular area where our points occur using leaflet:
+```{r}
+leaflet(data=coords) %>% 
+  addProviderTiles(providers$Esri.NatGeoWorldMap) %>% 
+  addCircleMarkers(~long, ~lat, label=as.character(ID)) %>%
+  addRectangles(
+    lng1=min(long), lat1=min(lat),
+    lng2=max(long), lat2=max(lat))
+```
+
+And now lets look at what that same area looks like with the raster data:
+```{r}
+plot(alt, xlab="Longitude", ylab="Latitude", 
+     ylim=c(min(lat), max(lat)),
+     xlim=c(min(long), max(long)))
+```
+
+These rectangles are over the same area, and we can see that this is a bit grainy! This is because the pixel size is 30 minutes.
+
+But, to the important part! On to extracting the data!! 
+
+Remember, http://www.worldclim.org/bioclim explains what each of the 19 bioclimatic variables refers to.
+
+Lets just select 1 and 12 - mean annual temperature (C*10) and precipitation (mm). To do that, we are going to narrow down which layers of the raster stack we want to look at, which is kind of like working with an array (layers of matrices).
+
+This takes a few steps to do:
+```{r}
+# reduce the layers in our RasterStack to the variables we want to look at
+r <- r[[c(1, 12)]] 
+# we can name these two layers
+names(r) <- c("Tmean", "Prec")
+
+# the steps to extract values for the variables you want from the coordinates:
+points <- SpatialPoints(coords, proj4string = r@crs)
+# getting temp and precip for the points
+clim <- extract(r, points)
+# getting the 30s altitude for the points
+altS <- extract(alt, points)
+# bind it all into one dataframe
+climate <- cbind.data.frame(coords, altS, clim)
+# what does this look like? 
+print(climate)
+```
+
+What is with those weird temperatures? They are actually in C*10!! Having temperature in this format reduces download time and filesize for the tiles. We can easily manipulate those columns into normal Celsius using a function from dplyr.
+```{r}
+library(dplyr)
+climate <- mutate(climate, MAT=Tmean/10) %>%
+  select(-Tmean)
+print(climate)
+```
+
+Look at that! The higher elevation plots have a lower mean annual temperature than the lower elevation plots. 
+
+Another thing you can do in the raster package is save raster data to your computer! Lets save the precipitation tile. You can open this using geospatial software like ARC GIS or QGIS, which is opensource.
+```{r}
+# x <- writeRaster(r$Prec, 'rastertile.tif')
+```
+
+You can also read in a raster file from your computer, but we wont do that now. The format to do that is the following:
+```{r}
+# f <- system.file("folder/filename.shp", package="raster")
+```
+
+
+So now that we get the basics, lets get the 2.5 minute climate data from some major cities.
+```{r}
+# creating a dataframe of cities and their coordinates
+cities <- data.frame(city=c("New York", "Bejing","Cape Town"), long=c(-74.0, 116.4, 18.4), lat=c(40.7, 39.9, -33.9))
+# downloading the data from worlclim
+r2 <- getData("worldclim", var="bio", res=2.5)
+# selecting the layers we want and naming them
+r2 <- r2[[c(1, 12)]] 
+names(r2) <- c("Tmean", "Precip")
+# putting our coordinates into the format r::raster likes
+points2 <- SpatialPoints(cities[,2:3], proj4string = r2@crs)
+# extracting the values for our city coordinates
+cc <- extract(r2, points2)
+# creating a dataframe with our results
+climate2 <- cbind.data.frame(cities, cc)
+print(climate2)
+
+# remember, t mean comes out in C*10!!
+climate2 <- mutate(climate2, MAT=Tmean/10) %>%
+  select(-Tmean)
+
+print(climate2)
+```
+These look MUCH warmer than the higher elevation coordinates on Mt. Mansfield from above :]
+
+
+How does the SRTM 90 meter altitudinal data look compared to the 30 second resolution data from worlclim? The 30 second elevational data we downloaded is originally from the SRTM dataset, but elevation data from worldclim has a larger grid size.
+```{r}
+srtm <- getData('SRTM', lon=-72, lat=44)
+altM <- extract(srtm, points)
+alt.vs <- cbind.data.frame(altS, altM)
+print(alt.vs)
+```
+
+How about mapping country boundaries on those SRTM maps? 
+
+Lets look at Ireland.
+```{r}
+# getting the SRTM tile
+irl.srtm <- getData('SRTM', lon=-7.6, lat=53)
+plot(irl.srtm)
+# getting the ireland boundary data
+ireland <- getData('GADM', country='IRL', level=0)
+plot(ireland, add=TRUE)
+```
+
+Well, looks like part of Ireland isn't visible here. What if I need more than one tile to do what I need to do??
+
+Lets get more tiles!!
+
+We can download tiles that are next to each other and use the mosaic function to put them together. Lets put another one on top so we can see more of the country.
+```{r}
+# another tile from Ireland
+ireland2 <- getData('SRTM', lon=-7.6, lat=56)
+#Mosaic/merge srtm tiles
+srtmMosaic <- mosaic(irl.srtm, ireland2, fun=mean)
+plot(srtmMosaic, xlim=c(-12,-5), ylim=c(51, 56))
+plot(ireland, add=TRUE)
+```
+
+
+Those were some of the basic functions of raster and a few of the datasets you can download tiles directly from. 
+
+Hope you enjoyed this tutorial!

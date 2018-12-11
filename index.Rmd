@@ -21,4 +21,6 @@ output:
 * [Homework #8](381HW8.html)
 * [Homework #9](381HW9.html)
 * [Homework #11](381HW11.html)
+* [Presentation on raster package](raster.html)
+* [.Rmd of raster presentation](raster.Rmd)
 

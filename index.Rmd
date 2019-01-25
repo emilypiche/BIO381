@@ -23,4 +23,5 @@ output:
 * [Homework #11](381HW11.html)
 * [Presentation on raster package](raster.html)
 * [.Rmd of raster presentation](raster.Rmd)
+* [GEOG 287 HW 2](HW2.html)
 
